@@ -1,0 +1,16 @@
+{
+  "name": "crm-ybacsi",
+  "version": "1.0.0",
+  "description": "MediCRM Chăm Sóc Sức Khỏe Khép Kín Cho Y Bác Sĩ",
+  "scripts": {
+    "start": "serve ."
+  },
+  "keywords": [
+    "crm",
+    "healthcare",
+    "doctor",
+    "clinic"
+  ],
+  "author": "",
+  "license": "MIT"
+}
