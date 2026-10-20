@@ -2,8 +2,16 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MediCRM – Quản Lý Hành Trình Chăm Sóc Y Bác Sĩ</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MediCRM">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -277,6 +285,9 @@
       </div>
 
       <div class="flex items-center space-x-2">
+        <button onclick="copyZaloHandout()" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center" title="Soạn và sao chép nội dung dặn dò gửi Zalo/SMS cho bệnh nhân">
+          <i class="fa-solid fa-share-nodes mr-1.5"></i> Dặn dò Zalo
+        </button>
         <button onclick="quickUpdatePhase()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg text-xs font-semibold">
           <i class="fa-solid fa-arrow-right-arrow-left mr-1"></i> Đổi giai đoạn
         </button>
@@ -390,7 +401,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-xs">
-          <!-- Block 1: Định danh, Ngày sinh, Địa chỉ -->
+          <!-- Block 1 -->
           <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
             <h4 class="font-bold text-slate-800 flex items-center justify-between">
               <span><i class="fa-solid fa-user text-teal-600 mr-2"></i> 1. Thông Tin Cá Nhân & Nhân Khẩu Học</span>
@@ -434,7 +445,7 @@
             </div>
           </div>
 
-          <!-- Block 2: Tâm lý & Tuân thủ trị liệu -->
+          <!-- Block 2 -->
           <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
             <h4 class="font-bold text-slate-800 flex items-center justify-between">
               <span><i class="fa-solid fa-brain text-purple-600 mr-2"></i> 2. Tâm Lý & Mức Độ Tuân Thủ</span>
@@ -456,7 +467,7 @@
 
             <div>
               <label class="text-slate-500 font-medium text-[11px]">Đặc điểm tâm lý & Thái độ với bệnh</label>
-              <textarea id="p1_psychology" rows="2" placeholder="VD: Hay lo âu bồn chồn khi thay đổi thời tiết, sợ tác dụng phụ, cầu toàn, cần giải thích cặn kẽ..." class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs"></textarea>
+              <textarea id="p1_psychology" rows="2" placeholder="VD: Hay lo âu bồn chồn khi thay đổi thời tiết, sợ tác dụng phụ, cầu toàn, cần động viên..." class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs"></textarea>
             </div>
 
             <div>
@@ -470,7 +481,7 @@
             </div>
           </div>
 
-          <!-- Block 3: Sinh tồn & Điểm đau -->
+          <!-- Block 3: Sinh tồn với Cảnh Báo Trực Quan Thời Gian Thực -->
           <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
             <h4 class="font-bold text-slate-800 flex items-center justify-between">
               <span><i class="fa-solid fa-heart-pulse text-rose-500 mr-2"></i> 3. Sinh Tồn & Điểm Đau (VAS)</span>
@@ -478,16 +489,25 @@
             </h4>
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="text-slate-500 font-medium text-[11px]">Huyết áp (mmHg)</label>
-                <input type="text" id="p1_bp" placeholder="120/80" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                <div class="flex justify-between items-center">
+                  <label class="text-slate-500 font-medium text-[11px]">Huyết áp (mmHg)</label>
+                  <span id="bpWarning" class="text-[9px] font-bold text-rose-600 hidden">⚠️ Tăng HA</span>
+                </div>
+                <input type="text" id="p1_bp" placeholder="120/80" oninput="checkRealtimeVitals()" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs transition-colors">
               </div>
               <div>
-                <label class="text-slate-500 font-medium text-[11px]">Nhịp tim</label>
-                <input type="number" id="p1_hr" placeholder="75" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                <div class="flex justify-between items-center">
+                  <label class="text-slate-500 font-medium text-[11px]">Nhịp tim</label>
+                  <span id="hrWarning" class="text-[9px] font-bold text-amber-600 hidden">⚠️ Nhanh</span>
+                </div>
+                <input type="number" id="p1_hr" placeholder="75" oninput="checkRealtimeVitals()" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs transition-colors">
               </div>
               <div>
-                <label class="text-slate-500 font-medium text-[11px]">Thân nhiệt (°C)</label>
-                <input type="number" step="0.1" id="p1_temp" placeholder="36.5" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                <div class="flex justify-between items-center">
+                  <label class="text-slate-500 font-medium text-[11px]">Thân nhiệt (°C)</label>
+                  <span id="tempWarning" class="text-[9px] font-bold text-rose-600 hidden">⚠️ Sốt</span>
+                </div>
+                <input type="number" step="0.1" id="p1_temp" placeholder="36.5" oninput="checkRealtimeVitals()" class="w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs transition-colors">
               </div>
               <div>
                 <label class="text-slate-500 font-medium text-[11px]">Chiều cao (cm)</label>
@@ -507,11 +527,11 @@
                 <span>Thang điểm đau VAS (0-10):</span>
                 <span id="p1_painDisplay" class="font-bold text-rose-600">0 / 10</span>
               </div>
-              <input type="range" id="p1_painSlider" min="0" max="10" value="0" oninput="document.getElementById('p1_painDisplay').innerText = this.value + ' / 10'" class="w-full mt-1 accent-rose-600">
+              <input type="range" id="p1_painSlider" min="0" max="10" value="0" oninput="updatePainSlider(this.value)" class="w-full mt-1 accent-rose-600">
             </div>
           </div>
 
-          <!-- Block 4: Tứ chẩn YHCT -->
+          <!-- Block 4: Tứ chẩn -->
           <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
             <h4 class="font-bold text-slate-800 flex items-center">
               <i class="fa-solid fa-leaf text-teal-600 mr-2"></i> 4. Đánh Giá Tứ Chẩn YHCT
@@ -552,22 +572,36 @@
     <!-- ---------------- TAB 2: RECIPE & KẾ HOẠCH ---------------- -->
     <div id="view-phase2" class="tab-view hidden space-y-5">
       <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
-        <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+        <div class="flex flex-wrap justify-between items-center gap-2 pb-4 border-b border-slate-100">
           <div>
             <h3 class="font-bold text-slate-900 text-sm">Kế Hoạch Điều Trị / Recipe Cá Nhân Hóa</h3>
             <p class="text-xs text-slate-500">Mục tiêu, phân chia đợt và 5 nhóm can thiệp y khoa</p>
           </div>
-          <div class="flex space-x-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- 1-Click Recipe Preset Dropdown -->
+            <div class="relative inline-block text-left">
+              <select onchange="applyRecipePreset(this.value); this.value='';" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold rounded-lg shadow-xs cursor-pointer">
+                <option value="">⚡ Mẫu phác đồ 1-click...</option>
+                <option value="insomnia">🌿 Mất ngủ mãn tính (Tâm Tỳ Hư)</option>
+                <option value="spine">🦴 Đau cột sống thắt lưng thoái hóa</option>
+                <option value="metabolic">🩺 Tiền đái tháo đường & Tăng HA</option>
+                <option value="neck">💆 Đau vai gáy & Rối loạn tiền đình</option>
+              </select>
+            </div>
+
             <button onclick="openModal('modalAddIntervention')" class="px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg shadow-xs">
               <i class="fa-solid fa-plus mr-1"></i> Thêm can thiệp
             </button>
             <button onclick="checkDrugInteractions()" class="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold rounded-lg">
               <i class="fa-solid fa-shield-virus mr-1"></i> Quét tương tác thuốc
             </button>
+            <button onclick="copyZaloHandout()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center">
+              <i class="fa-solid fa-share-nodes mr-1.5"></i> Dặn dò Zalo
+            </button>
           </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
             <span class="text-slate-500 font-medium text-[11px]">Đợt điều trị hiện tại</span>
             <input type="text" id="recipeRound" value="Đợt 1 (4 tuần)" class="w-full mt-1 p-1.5 bg-white border border-slate-200 rounded font-bold text-slate-800">
@@ -580,6 +614,18 @@
             <span class="text-slate-500 font-medium text-[11px]">Bác sĩ phê duyệt & Ký số</span>
             <input type="text" id="recipeDoctor" readonly class="w-full mt-1 p-1.5 bg-slate-100 border border-slate-200 rounded text-teal-800 font-bold">
           </div>
+          <!-- Fast Date Picker for Next Followup -->
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium text-[11px]">Lịch hẹn tái khám</span>
+              <div class="space-x-1">
+                <button type="button" onclick="setQuickFollowup(7)" class="text-[9px] bg-slate-200 hover:bg-slate-300 px-1.5 py-0.5 rounded font-bold">+7N</button>
+                <button type="button" onclick="setQuickFollowup(14)" class="text-[9px] bg-slate-200 hover:bg-slate-300 px-1.5 py-0.5 rounded font-bold">+14N</button>
+                <button type="button" onclick="setQuickFollowup(30)" class="text-[9px] bg-slate-200 hover:bg-slate-300 px-1.5 py-0.5 rounded font-bold">+1T</button>
+              </div>
+            </div>
+            <input type="date" id="recipeFollowup" class="w-full mt-1 p-1.5 bg-white border border-slate-200 rounded font-semibold text-slate-800">
+          </div>
         </div>
 
         <div class="mt-5">
@@ -587,7 +633,7 @@
             <i class="fa-solid fa-list-check text-teal-600 mr-2"></i> Danh Sách Can Thiệp
           </h4>
           <div id="interventionList" class="space-y-2 text-xs">
-            <p class="text-slate-400 text-center py-6">Chưa có can thiệp nào. Nhấn "+ Thêm can thiệp" để bắt đầu.</p>
+            <p class="text-slate-400 text-center py-6">Chưa có can thiệp nào. Nhấn "+ Thêm can thiệp" hoặc chọn "Mẫu phác đồ 1-click".</p>
           </div>
         </div>
 
@@ -754,7 +800,7 @@
 
   </main>
 
-  <!-- ================= MODAL: TIẾP NHẬN BỆNH NHÂN MỚI (VỚI PID, NGÀY SINH, ĐỊA CHỈ, TÂM LÝ, TUÂN THỦ) ================= -->
+  <!-- ================= MODAL: TIẾP NHẬN BỆNH NHÂN MỚI ================= -->
   <div id="modalAddPatient" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -953,7 +999,13 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="font-medium text-slate-700">Ngày dự kiến</label>
+            <div class="flex justify-between items-center">
+              <label class="font-medium text-slate-700">Ngày dự kiến</label>
+              <div class="space-x-1">
+                <button type="button" onclick="setQuickScreening(30)" class="text-[9px] bg-slate-200 hover:bg-slate-300 px-1 py-0.5 rounded font-bold">+1T</button>
+                <button type="button" onclick="setQuickScreening(90)" class="text-[9px] bg-slate-200 hover:bg-slate-300 px-1 py-0.5 rounded font-bold">+3T</button>
+              </div>
+            </div>
             <input type="date" id="screen_date" class="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg">
           </div>
           <div>
@@ -996,6 +1048,11 @@
     }
 
     function init() {
+      // Register Service Worker for PWA
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      }
+
       // 1. Load Users
       const savedUsers = localStorage.getItem('medi_crm_users_v1');
       if (savedUsers) {
@@ -1029,7 +1086,6 @@
       if (savedPatients) {
         try {
           state.patients = JSON.parse(savedPatients);
-          // Ensure every patient has a PID
           state.patients.forEach(p => {
             if (!p.pid) p.pid = generatePid();
           });
@@ -1050,7 +1106,7 @@
       initChart();
     }
 
-    // Display Name with Anonymization support
+    // Display Name with Anonymization
     function getPatientDisplayName(p) {
       if (!p) return '--';
       if (state.isAnonymized) {
@@ -1331,6 +1387,199 @@
       }
     }
 
+    // Real-time Critical Vitals Flagging
+    function checkRealtimeVitals() {
+      const bpVal = document.getElementById('p1_bp').value.trim();
+      const hrVal = parseInt(document.getElementById('p1_hr').value);
+      const tempVal = parseFloat(document.getElementById('p1_temp').value);
+
+      // BP Check
+      const bpWarning = document.getElementById('bpWarning');
+      const bpInp = document.getElementById('p1_bp');
+      if (bpVal.includes('/')) {
+        const [sys, dia] = bpVal.split('/').map(x => parseInt(x.trim()));
+        if (sys >= 140 || dia >= 90) {
+          bpWarning.classList.remove('hidden');
+          bpInp.className = 'w-full mt-1 p-2 bg-rose-50 border border-rose-300 text-rose-900 font-bold rounded-lg text-xs';
+        } else {
+          bpWarning.classList.add('hidden');
+          bpInp.className = 'w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs';
+        }
+      }
+
+      // HR Check
+      const hrWarning = document.getElementById('hrWarning');
+      const hrInp = document.getElementById('p1_hr');
+      if (hrVal > 100 || (hrVal > 0 && hrVal < 55)) {
+        hrWarning.classList.remove('hidden');
+        hrWarning.innerText = hrVal > 100 ? '⚠️ Nhịp nhanh' : '⚠️ Nhịp chậm';
+        hrInp.className = 'w-full mt-1 p-2 bg-amber-50 border border-amber-300 text-amber-900 font-bold rounded-lg text-xs';
+      } else {
+        hrWarning.classList.add('hidden');
+        hrInp.className = 'w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs';
+      }
+
+      // Temp Check
+      const tempWarning = document.getElementById('tempWarning');
+      const tempInp = document.getElementById('p1_temp');
+      if (tempVal >= 38.0) {
+        tempWarning.classList.remove('hidden');
+        tempInp.className = 'w-full mt-1 p-2 bg-rose-50 border border-rose-300 text-rose-900 font-bold rounded-lg text-xs';
+      } else {
+        tempWarning.classList.add('hidden');
+        tempInp.className = 'w-full mt-1 p-2 bg-white border border-slate-200 rounded-lg text-xs';
+      }
+    }
+
+    function updatePainSlider(val) {
+      const disp = document.getElementById('p1_painDisplay');
+      disp.innerText = val + ' / 10';
+      if (val >= 8) {
+        disp.className = 'font-bold text-rose-600 animate-pulse text-sm';
+      } else if (val >= 5) {
+        disp.className = 'font-bold text-amber-600 text-xs';
+      } else {
+        disp.className = 'font-bold text-teal-700 text-xs';
+      }
+    }
+
+    // Fast Followup Date Calculation (+7, +14, +30 days)
+    function setQuickFollowup(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      const iso = d.toISOString().split('T')[0];
+      const target = document.getElementById('recipeFollowup');
+      if (target) {
+        target.value = iso;
+        const p = getActive();
+        if (p) {
+          p.followupDate = iso;
+          saveState();
+        }
+      }
+    }
+
+    function setQuickScreening(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      document.getElementById('screen_date').value = d.toISOString().split('T')[0];
+    }
+
+    // 1-Click Recipe Presets
+    function applyRecipePreset(type) {
+      const p = getActive();
+      if (!p) { alert('Vui lòng chọn bệnh nhân trước!'); return; }
+      if (!p.interventions) p.interventions = [];
+
+      const presets = {
+        insomnia: {
+          round: 'Đợt 1 (4 tuần) - Khởi động an thần',
+          goal: 'Dễ vào giấc ngủ trong 20 phút, ngủ liền mạch 6.5h - 7h',
+          avoid: 'Tuyệt đối không uống cà phê, trà mạn sau 14h chiều, hạn chế màn hình sau 21h30',
+          emergency: 'Chóng mặt dữ dội, ảo giác hoặc lơ mơ không tỉnh táo',
+          items: [
+            { type: 'herb', name: 'Trà Hoa Cúc – Tâm Sen – Táo Nhân', dosage: '1 gói túi lọc hãm 250ml nước sôi, uống lúc 20h30', note: 'Uống ấm trước ngủ 45 phút' },
+            { type: 'sleep', name: 'Giao thức thở 4-7-8 & Vệ sinh giấc ngủ', dosage: 'Thực hiện 4 chu kỳ thở khi lên giường lúc 22h00', note: 'Phòng ngủ tối hoàn toàn, thoáng mát 25°C' },
+            { type: 'diet', name: 'Dinh dưỡng bổ trợ Magie & Tryptophan', dosage: 'Cháo hạt sen, chuối chín, ăn bữa tối nhẹ trước 19h00', note: 'Tránh ăn no hoặc đồ chiên rán ban đêm' },
+            { type: 'exercise', name: 'Đi bộ thư giãn cuối ngày', dosage: '20 phút đi bộ nhẹ nhàng trước 18h30', note: 'Không tập cường độ cao sát giờ ngủ' }
+          ]
+        },
+        spine: {
+          round: 'Đợt 1 (4 tuần) - Giảm co cứng cột sống',
+          goal: 'Giảm đau lưng VAS từ 6/10 xuống <= 3/10, ngồi làm việc 45 phút không đau buốt',
+          avoid: 'Cúi khom lưng nâng vật nặng đột ngột, ngồi vẹo người một bên, vặn xoắn cột sống',
+          emergency: 'Tê bì vùng mông đáy chậu, mất kiểm soát tiểu tiện, liệt chân không đứng được',
+          items: [
+            { type: 'exercise', name: 'Chuỗi bài tập Williams kéo giãn cơ lưng', dosage: '15 phút vào 7h sáng và 17h30 chiều', note: 'Dừng ngay nếu đau buốt lan dọc chân' },
+            { type: 'herb', name: 'Bài thảo dược Thông kinh hoạt lạc', dosage: '1 thang sắc uống ngày 2 lần sau ăn ấm', note: 'Tác dụng khu phong hoạt huyết' },
+            { type: 'diet', name: 'Bổ sung Canxi & Vitamin D3', dosage: 'Uống nhiều nước ấm, tăng rau xanh thẫm, sữa hạt', note: 'Giảm ăn mặn dưới 5g muối/ngày' },
+            { type: 'med', name: 'Chườm ấm vùng thắt lưng', dosage: '20 phút trước khi đi ngủ', note: 'Nhiệt độ ấm dễ chịu, tránh gây bỏng da' }
+          ]
+        },
+        metabolic: {
+          round: 'Đợt 1 (8 tuần) - Ổn định huyết áp & chuyển hóa',
+          goal: 'Duy trì Huyết áp < 130/80 mmHg, đường huyết đói < 5.6 mmol/L, giảm 2kg bền vững',
+          avoid: 'Ăn mặn, đồ đóng hộp, phủ tạng động vật, rượu bia quá 1 đơn vị cồn/ngày',
+          emergency: 'Huyết áp vọt > 170/100, đau thắt ngực, khó thở hoặc yếu nửa người',
+          items: [
+            { type: 'diet', name: 'Chế độ ăn Địa Trung Hải (DASH)', dosage: 'Tăng dầu ô liu, cá béo, các loại hạt, giảm tinh bột nhanh', note: 'Nghiêm ngặt giảm muối' },
+            { type: 'exercise', name: 'Đi bộ nhanh đạt 150 phút/tuần', dosage: '30 phút x 5 ngày/tuần vào sáng sớm hoặc chiều', note: 'Đo huyết áp trước và sau tập' },
+            { type: 'herb', name: 'Trà Giảo Cổ Lam – Nụ Tam Thất', dosage: 'Hãm uống thay nước trà hàng ngày', note: 'Hỗ trợ hạ áp và mỡ máu' },
+            { type: 'med', name: 'Đo và ghi sổ Huyết áp tại nhà', dosage: 'Đo 2 lần/ngày (Sáng sau thức dậy và Tối trước ngủ)', note: 'Ghi lại chỉ số vào MediCRM' }
+          ]
+        },
+        neck: {
+          round: 'Đợt 1 (3 tuần) - Giải tỏa co cứng cổ vai gáy',
+          goal: 'Xoay cổ thoải mái, hết cảm giác chóng mặt hoa mắt khi thay đổi tư thế',
+          avoid: 'Cúi đầu nhìn điện thoại liên tục > 30 phút, gối đầu quá cao khi ngủ',
+          emergency: 'Chóng mặt kèm nôn vọt, nhìn đôi, nói ngọng hoặc nuốt nghẹn',
+          items: [
+            { type: 'exercise', name: 'Bài tập vận động cổ & kéo giãn cơ thang', dosage: '10 phút mỗi 2 tiếng làm việc văn phòng', note: 'Động tác chậm rãi, hít thở đều' },
+            { type: 'herb', name: 'Trà Đinh Lăng – Bạch Quả', dosage: '1 gói túi lọc uống sáng và đầu giờ chiều', note: 'Tăng tuần hoàn máu não' },
+            { type: 'med', name: 'Xoa bóp day ấn huyệt Phong trì, Kiên tỉnh', dosage: '10 phút vào buổi tối', note: 'Có thể dùng tinh dầu tràm hoặc gừng ấm' }
+          ]
+        }
+      };
+
+      const sel = presets[type];
+      if (!sel) return;
+
+      if (confirm(`Áp dụng mẫu phác đồ: "${sel.round}"?\nCác mục can thiệp sẽ được điền tự động vào Recipe của bệnh nhân.`)) {
+        document.getElementById('recipeRound').value = sel.round;
+        document.getElementById('recipeGoal').value = sel.goal;
+        document.getElementById('safetyAvoid').value = sel.avoid;
+        document.getElementById('safetyEmergency').value = sel.emergency;
+
+        p.interventions = [...sel.items];
+        setQuickFollowup(14); // Set 14 days default
+        saveState();
+      }
+    }
+
+    // Format & Copy Patient Zalo / SMS Handout
+    function copyZaloHandout() {
+      const p = getActive();
+      if (!p) { alert('Vui lòng chọn bệnh nhân!'); return; }
+      const u = state.currentUser || { name: 'ThS.BS Điều trị', specialty: 'Phòng khám' };
+      const patDisplay = getPatientDisplayName(p);
+      const followup = document.getElementById('recipeFollowup')?.value || 'Theo hẹn của Bác sĩ';
+
+      let text = `🏥 [PHÒNG KHÁM Y BÁC SĨ] - DẶN DÒ ĐIỀU TRỊ\n`;
+      text += `Kính gửi: ${patDisplay}\n`;
+      text += `Bác sĩ phụ trách: ${u.name} (${u.specialty})\n`;
+      text += `--------------------------------------\n`;
+      text += `🎯 MỤC TIÊU: ${document.getElementById('recipeGoal')?.value || 'Cải thiện sức khỏe và giảm triệu chứng'}\n\n`;
+
+      text += `📋 HƯỚNG DẪN DÙNG THUỐC & TỰ CHĂM SÓC:\n`;
+      if (p.interventions && p.interventions.length > 0) {
+        p.interventions.forEach((inv, i) => {
+          text += `${i+1}. ${inv.name}\n   👉 Liều dùng: ${inv.dosage || '--'}\n`;
+          if (inv.note) text += `   ⚠️ Lưu ý: ${inv.note}\n`;
+        });
+      } else {
+        text += `- Tiếp tục duy trì chế độ sinh hoạt lành mạnh theo chỉ định trực tiếp.\n`;
+      }
+
+      const avoid = document.getElementById('safetyAvoid')?.value;
+      if (avoid) {
+        text += `\n🚫 ĐIỀU CẦN TRÁNH: ${avoid}\n`;
+      }
+
+      const emergency = document.getElementById('safetyEmergency')?.value;
+      if (emergency) {
+        text += `\n🚨 DẤU HIỆU CẦN ĐI VIỆN NGAY: ${emergency}\n`;
+      }
+
+      text += `\n📅 LỊCH HẸN TÁI KHÁM: ${followup}\n`;
+      text += `Chúc Bác/Anh/Chị mau chóng hồi phục sức khỏe!`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ ĐÃ SAO CHÉP NỘI DUNG DẶN DÒ THÀNH CÔNG!\n\nBạn chỉ cần mở Zalo của bệnh nhân và nhấn Ctrl + V (hoặc Dán) để gửi ngay.');
+      }).catch(() => {
+        prompt('Sao chép nội dung dặn dò bên dưới để dán vào Zalo:', text);
+      });
+    }
+
     // Render Phase 1
     function renderPhase1() {
       const p = getActive();
@@ -1345,14 +1594,12 @@
       document.getElementById('p1_contact').value = p.contact || '';
       document.getElementById('p1_issue').value = p.issue || '';
 
-      // Psychology & Compliance
       document.getElementById('p1_psychology').value = p.psychology || '';
       document.getElementById('p1_complianceSlider').value = p.compliance || 85;
       updateComplianceDisplay(p.compliance || 85);
       document.getElementById('p1_complianceBarrier').value = p.complianceBarrier || '';
       document.getElementById('p1_allergy').value = p.allergy || '';
 
-      // Vitals
       document.getElementById('p1_bp').value = p.vitals?.bp || '';
       document.getElementById('p1_hr').value = p.vitals?.hr || '';
       document.getElementById('p1_temp').value = p.vitals?.temp || '';
@@ -1360,9 +1607,8 @@
       document.getElementById('p1_weight').value = p.vitals?.weight || '';
       document.getElementById('p1_painArea').value = p.painArea || '';
       document.getElementById('p1_painSlider').value = p.painScore || 0;
-      document.getElementById('p1_painDisplay').innerText = (p.painScore || 0) + ' / 10';
+      updatePainSlider(p.painScore || 0);
 
-      // TCM
       document.getElementById('p1_tcm_vong').value = p.tcm?.vong || '';
       document.getElementById('p1_tcm_van').value = p.tcm?.van || '';
       document.getElementById('p1_tcm_van_hoi').value = p.tcm?.van_hoi || '';
@@ -1370,6 +1616,7 @@
       document.getElementById('p1_tcm_conclusion').value = p.tcm?.conclusion || '';
 
       recalcBMI();
+      checkRealtimeVitals();
     }
 
     function savePhase1() {
@@ -1429,7 +1676,7 @@
       const p = getActive();
       const container = document.getElementById('interventionList');
       if (!p || !p.interventions || p.interventions.length === 0) {
-        container.innerHTML = '<p class="text-slate-400 text-center py-6">Chưa có can thiệp nào. Nhấn "+ Thêm can thiệp" để tạo.</p>';
+        container.innerHTML = '<p class="text-slate-400 text-center py-6">Chưa có can thiệp nào. Nhấn "+ Thêm can thiệp" hoặc chọn "Mẫu phác đồ 1-click".</p>';
         return;
       }
 
